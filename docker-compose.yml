@@ -1,0 +1,22 @@
+version: '3.1'
+
+services:
+    webdav:
+        build:
+            context: ../webdav
+            args:
+                TZ: "America/New_York"
+        image: webdav:20171226
+        container_name: webdav
+        hostname: webdav
+#        restart: unless-stopped
+        environment:
+            TZ: "America/New_York"
+        volumes:
+            - ../webdav/vols/config:/config
+            - ../webdav/vols/webdav:/webdav
+            - ../webdev/vols/log:/var/log 
+        logging:
+            driver: "json-file"
+            options:
+                max-size: "10m"
