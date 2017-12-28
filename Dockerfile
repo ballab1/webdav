@@ -1,9 +1,17 @@
 FROM alpine:3.6
 
 ARG TZ="America/New_York"
+ARG USERNAME="${CFG_MYSQL_USER}"
+ARG PASSWD="${CFG_MYSQL_PASSWORD}"
+ARG GROUP='bobb'
+#ARG READWRITE=''
+#ARG WHITELIST=''
 
 ENV VERSION=1.0.0 \
-    TZ="America/New_York"
+    USERNAME="${CFG_MYSQL_USER}" \
+    PASSWD="${CFG_MYSQL_PASSWORD}" \
+    GROUP='bobb'
+    
     
 LABEL version=$VERSION
 

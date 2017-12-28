@@ -1,43 +1,65 @@
-#!/bin/sh
+#!/bin/bash
+
+# ENV params:   USERNAME, PASSWD, GROUP, READWRITE, WHITELIST
+
 
 set -o errexit
 
-# Force user and group because lighttpd runs as webdav
-USERNAME=${USERNAME:-webdav}
-GROUP=${GROUP:-webdav}
+export WEBDAV_HOME="${WEBDAV_HOME:-/webdav}"
+declare webdav_user="${USERNAME:-webdav}"
+declare webdav_pwd="${PASSWD}"
+declare webdav_group="${GROUP:-webdav}"
 
-# Only allow read access by default
-READWRITE=${READWRITE:=false}
 
+function isReadOnly()
+{
+    # Only allow read access by default
+    READWRITE=${READWRITE:=false}
+
+    local isRO='"enable"'
+    [[ "$READWRITE" == "true" ]] && isRO='"disable"'
+    echo "s|is-readonly = \"\\w*\"|is-readonly = ${isRO}|"
+}
+
+function setHtPasswd()
+{
+    local -r webdav_user=$1
+    local -r webdav_pwd=$2
+    
+    [[ -z "${webdav_user}" || -z "${webdav_pwd}" ]] && return
+    sudo rm /etc/lighttpd/htpasswd
+    echo "${webdav_pwd}" | sudo htpasswd -c /etc/lighttpd/htpasswd "${webdav_user}"
+    sudo chmod 444 /etc/lighttpd/htpasswd
+}
+
+function setPermissionsOnVolumes()
+{
+    local webdav_user=$1
+    local webdav_group=$2
+
+    sudo chmod 777 -R /var/log
+    sudo chown "${webdav_user}":"${webdav_group}" /var/log
+    sudo chown "${webdav_user}":"${webdav_group}" /etc/lighttpd/htpasswd
+    sudo chown "${webdav_user}:${webdav_group}" -R "${WEBDAV_HOME}"
+}
+
+function updateWhiteList()
+{
+    [[ -n "$WHITELIST" ]] && sed -i "s/WHITELIST/${WHITELIST}/" /etc/lighttpd/webdav.conf
+    sudo sed -i "$( isReadOnly )" /etc/lighttpd/webdav.conf
+}
+
+
+#[[ -e /config ]] && ln -s /config /etc/lighttpd
+webdav_user='webdav'
+webdav_group='webdav'
 
 if [ "$1" = 'webdav' ]; then
+    setHtPasswd "$webdav_user" "$webdav_pwd"
+    updateWhiteList    
+    setPermissionsOnVolumes "$webdav_user" "$webdav_group"
 
-    # Add user if it does not exist
-    if ! id -u "${USERNAME}" >/dev/null 2>&1; then
-      addgroup -g ${USER_GID:=2222} ${GROUP}
-      adduser -G ${GROUP} -D -H -u ${USER_UID:=2222} ${USERNAME}
-    fi
-
-    chown "${USERNAME}":"${GROUP}" /var/log
-
-    [[ -n "$WHITELIST" ]] && sed -i "s/WHITELIST/${WHITELIST}/" /etc/lighttpd/webdav.conf
-
-    if [ "$READWRITE" == "true" ]; then
-      sed -i "s/is-readonly = \"\\w*\"/is-readonly = \"disable\"/" /etc/lighttpd/webdav.conf
-    else
-      sed -i "s/is-readonly = \"\\w*\"/is-readonly = \"enable\"/" /etc/lighttpd/webdav.conf
-    fi
-
-    [[ ! -f /config/htpasswd    ]] &&  cp /etc/lighttpd/htpasswd /config/htpasswd
-    [[ ! -f /config/webdav.conf ]] &&  cp /etc/lighttpd/webdav.conf /config/webdav.conf
-
-    lighttpd -f /etc/lighttpd/lighttpd.conf
-
-    # Hang on a bit while the server starts
-    sleep 3665
-
-    tail -f /var/log/lighttpd/*.log
-
+    lighttpd -f /etc/lighttpd/lighttpd.conf -D
 else
     exec $@
 fi

@@ -6,14 +6,23 @@ services:
             context: ../webdav
             args:
                 TZ: "America/New_York"
+                USERNAME: "${CFG_MYSQL_USER}"
+                PASSWD: "${CFG_MYSQL_PASSWORD}"
+                GROUP: 'bobb'
+#                READWRITE: false
+#                WHITELIST: ''
         image: webdav:20171226
         container_name: webdav
         hostname: webdav
 #        restart: unless-stopped
         environment:
             TZ: "America/New_York"
+            USERNAME: "${CFG_MYSQL_USER}"
+            PASSWD: "${CFG_MYSQL_PASSWORD}"
+            GROUP: 'bobb'
+#            READWRITE: false
+#            WHITELIST: ''
         volumes:
-            - ../webdav/vols/config:/config
             - ../webdav/vols/webdav:/webdav
             - ../webdev/vols/log:/var/log 
         logging:
