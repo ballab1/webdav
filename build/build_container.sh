@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -o xtrace
+set -o xtrace
 set -o errexit
 set -o nounset 
 #set -o verbose
@@ -15,12 +15,16 @@ declare -r BUILDTIME_PKGS="shadow"
 declare -r CORE_PKGS="bash lighttpd lighttpd-mod_webdav lighttpd-mod_auth sudo thttpd tzdata"
 
 #directories
-declare -r WEBDAV_HOME=/webdav
+declare -r WEBDAV_HOME="${WEBDAV_HOME:-/webdav}"
+declare -r WEBDAV_CONF_DIR=/etc/lighttpd
+
+# Only allow read access by default
+declare -r WEBDAV_READWRITE=${WEBDAV_READWRITE:='disable'}
+declare -r WEBDAV_WHITELIST=${WEBDAV_WHITELIST:-'.'}
+
 
 #  groups/users
-declare -r webdav_user=${webdav_user:-'webdav'}
 declare -r webdav_uid=${webdav_uid:-2222}
-declare -r webdav_group=${webdav_group:-'webdav'}
 declare -r webdav_gid=${webdav_gid:-2222}
 
 
@@ -76,7 +80,6 @@ function createUserAndGroup()
     local -r gid=$4
     local -r homedir=$5
     local -r shell=$6
-    local result
     
     local wanted=$( printf '%s:%s' $group $gid )
     local nameMatch=$( getent group "${group}" | awk -F ':' '{ printf "%s:%s",$1,$3 }' )
@@ -84,7 +87,7 @@ function createUserAndGroup()
     printf "\e[1;34mINFO: group/gid (%s):  is currently (%s)/(%s)\e[0m\n" "$wanted" "$nameMatch" "$idMatch"           
 
     if [[ $wanted != $nameMatch  ||  $wanted != $idMatch ]]; then
-        printf "\ncreate group:  %s\n" $group
+        printf "\ncreate group:  %s\n" "${group}"
         [[ "$nameMatch"  &&  $wanted != $nameMatch ]] && groupdel "$( getent group ${group} | awk -F ':' '{ print $1 }' )"
         [[ "$idMatch"    &&  $wanted != $idMatch ]]   && groupdel "$( getent group ${gid} | awk -F ':' '{ print $1 }' )"
         /usr/sbin/groupadd --gid "${gid}" "${group}"
@@ -97,7 +100,7 @@ function createUserAndGroup()
     printf "\e[1;34mINFO: user/uid (%s):  is currently (%s)/(%s)\e[0m\n" "$wanted" "$nameMatch" "$idMatch"    
     
     if [[ $wanted != $nameMatch  ||  $wanted != $idMatch ]]; then
-        printf "create user: %s\n" $user
+        printf "create user: %s\n" "${user}"
         [[ "$nameMatch"  &&  $wanted != $nameMatch ]] && userdel "$( getent passwd ${user} | awk -F ':' '{ print $1 }' )"
         [[ "$idMatch"    &&  $wanted != $idMatch ]]   && userdel "$( getent passwd ${uid} | awk -F ':' '{ print $1 }' )"
 
@@ -115,14 +118,26 @@ function header()
 #############################################################################
 function install_WEBDAV()
 {
+    local -r user=$1
+    local -r group=$2
+    local -r pwd=$3
+    
     printf "\nAdd configuration and customizations\n"
     cp -r "${TOOLS}/etc"/* /etc
     cp -r "${TOOLS}/usr"/* /usr
     ln -s /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh
-    
-    [[ -e /etc/lighttpd/htpasswd ]]  && rm /etc/lighttpd/htpasswd
-    echo "${PASSWD}" | htpasswd -c /etc/lighttpd/htpasswd "${USERNAME}"
-    chmod 444 /etc/lighttpd/htpasswd
+
+    echo "${user} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+    mkdir -p "$WEBDAV_HOME"
+
+    source /usr/local/bin/webdav-helper.sh
+    setConfigParams "$WEBDAV_CONF_DIR" \
+                    "$WEBDAV_HOME" \
+                    "$user" \
+                    "$pwd" \
+                    "$group" \
+                    "$WEBDAV_WHITELIST" \
+                    "$WEBDAV_READWRITE"
 }
 
 #############################################################################
@@ -157,12 +172,13 @@ trap catch_pipe PIPE
 set -o verbose
 
 header
-declare -r USERNAME="${USERNAME?'Envorinment variable USERNAME must be defined'}"
-declare -r PASSWD="${PASSWD?'Envorinment variable PASSWD must be defined'}"
+declare -r webdav_user="${WEBDAV_USER:?'Envorinment variable WEBDAV_USER must be defined'}"
+declare -r webdav_pwd="${WEBDAV_USER_PWD:?'Envorinment variable WEBDAV_USER_PWD must be defined'}"
+declare -r webdav_group="${WEBDAV_GROUP:?'Envorinment variable WEBDAV_GROUP must be defined'}"
 installAlpinePackages
 createUserAndGroup "${webdav_user}" "${webdav_uid}" "${webdav_group}" "${webdav_gid}" "${WEBDAV_HOME}" /bin/bash
 installTimezone
-install_WEBDAV
+install_WEBDAV "${webdav_user}" "${webdav_group}" "${webdav_pwd}"
 setPermissions
 cleanup
-exit 0 
+exit 0

@@ -1,17 +1,13 @@
 FROM alpine:3.6
 
-ARG TZ="America/New_York"
-ARG USERNAME="${CFG_MYSQL_USER}"
-ARG PASSWD="${CFG_MYSQL_PASSWORD}"
-ARG GROUP='bobb'
-#ARG READWRITE=''
-#ARG WHITELIST=''
+ARG WEBDAV_USER="${CFG_MYSQL_USER}"
+ARG WEBDAV_USER_PWD="${CFG_MYSQL_PASSWORD}"
+ARG WEBDAV_GROUP='bobb'
+ARG WEBDAV_READWRITE='disable'
+ARG WEBDAV_WHITELIST='127.0.0.1'
 
 ENV VERSION=1.0.0 \
-    USERNAME="${CFG_MYSQL_USER}" \
-    PASSWD="${CFG_MYSQL_PASSWORD}" \
-    GROUP='bobb'
-    
+    TZ="America/New_York"
     
 LABEL version=$VERSION
 
@@ -26,10 +22,10 @@ RUN set -o verbose \
     && /tmp/build_container.sh \
     && rm -rf /tmp/*
 
-# We expose phpMyAdmin on port 80
+# We expose webdav on port 80
 #EXPOSE 80
-
-#VOLUME [ "/config", "/webdav" ]
+#USER $WEBDAV_USER
+#VOLUME [ "/webdav" ]
 
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 CMD ["webdav"]

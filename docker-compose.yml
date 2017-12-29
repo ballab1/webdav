@@ -6,25 +6,29 @@ services:
             context: ../webdav
             args:
                 TZ: "America/New_York"
-                USERNAME: "${CFG_MYSQL_USER}"
-                PASSWD: "${CFG_MYSQL_PASSWORD}"
-                GROUP: 'bobb'
-#                READWRITE: false
-#                WHITELIST: ''
+#                WEBDAV_USER: "${CFG_MYSQL_USER}"
+                WEBDAV_USER: 'webdav'
+                WEBDAV_USER_PWD: "${CFG_MYSQL_PASSWORD}"
+                WEBDAV_GROUP: 'webdav'
+                WEBDAV_READWRITE: 'disable'
+                WEBDAV_WHITELIST: '127.0.0.1'
         image: webdav:20171226
         container_name: webdav
         hostname: webdav
 #        restart: unless-stopped
         environment:
             TZ: "America/New_York"
-            USERNAME: "${CFG_MYSQL_USER}"
-            PASSWD: "${CFG_MYSQL_PASSWORD}"
-            GROUP: 'bobb'
-#            READWRITE: false
-#            WHITELIST: ''
+#            WEBDAV_USER: "${CFG_MYSQL_USER}"
+            WEBDAV_USER: 'webdav'
+            WEBDAV_USER_PWD: "${CFG_MYSQL_PASSWORD}"
+            WEBDAV_GROUP: 'webdav'
+            WEBDAV_READWRITE: 'disable'
+            WEBDAV_WHITELIST: '127.0.0.1'
+        ports:
+            - 8003:80
         volumes:
             - ../webdav/vols/webdav:/webdav
-            - ../webdev/vols/log:/var/log 
+#            - ../webdev/vols/log:/var/log 
         logging:
             driver: "json-file"
             options:
