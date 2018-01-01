@@ -25,10 +25,10 @@ services:
             WEBDAV_READWRITE: 'disable'
             WEBDAV_WHITELIST: '127.0.0.1'
         ports:
-            - 8003:80
+            - 8003:8003
         volumes:
             - ../webdav/vols/webdav:/webdav
-#            - ../webdav/vols/log:/var/log 
+            - ../webdav/vols/log:/var/log 
         logging:
             driver: "json-file"
             options:

@@ -21,7 +21,7 @@ if [ "$1" = 'webdav' ]; then
 #                       "$WEBDAV_GROUP" \
 #                       "$WEBDAV_WHITELIST" \
 #                       "$WEBDAV_READWRITE"
-
+echo "starting lighttpd -f '${conf_dir}/lighttpd.conf' -D"
     lighttpd -f "${conf_dir}/lighttpd.conf" -D
 else
     exec $@

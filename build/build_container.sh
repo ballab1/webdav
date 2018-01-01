@@ -13,6 +13,7 @@ declare -r TOOLS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 declare -r BUILDTIME_PKGS="shadow"
 declare -r CORE_PKGS="bash lighttpd lighttpd-mod_webdav lighttpd-mod_auth sudo thttpd tzdata"
+declare -r PERL_PKGS="perl perl-cgi perl-cgi-session perl-plack" 
 
 #directories
 declare -r WEBDAV_HOME="${WEBDAV_HOME:-/webdav}"
@@ -123,8 +124,12 @@ function install_WEBDAV()
     local -r pwd=$3
     
     printf "\nAdd configuration and customizations\n"
-    cp -r "${TOOLS}/etc"/* /etc
-    cp -r "${TOOLS}/usr"/* /usr
+
+    declare -a DIRECTORYLIST="/etc /usr /opt /var"
+    for dir in ${DIRECTORYLIST}; do
+        [[ -d "${TOOLS}/${dir}" ]] && cp -r "${TOOLS}/${dir}/"* "${dir}/"
+    done
+	
     ln -s /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh
 
     echo "${user} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -145,7 +150,7 @@ function installAlpinePackages()
 {
     apk update
     apk add --no-cache --virtual .buildDepedencies $BUILDTIME_PKGS
-    apk add --no-cache $CORE_PKGS
+    apk add --no-cache $CORE_PKGS $PERL_PKGS
 }
 
 #############################################################################
