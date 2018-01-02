@@ -129,7 +129,7 @@ function install_WEBDAV()
     for dir in ${DIRECTORYLIST}; do
         [[ -d "${TOOLS}/${dir}" ]] && cp -r "${TOOLS}/${dir}/"* "${dir}/"
     done
-	
+  
     ln -s /usr/local/bin/docker-entrypoint.sh /docker-entrypoint.sh
 
     echo "${user} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
@@ -177,9 +177,9 @@ trap catch_pipe PIPE
 set -o verbose
 
 header
-declare -r webdav_user="${WEBDAV_USER:?'Envorinment variable WEBDAV_USER must be defined'}"
-declare -r webdav_pwd="${WEBDAV_USER_PWD:?'Envorinment variable WEBDAV_USER_PWD must be defined'}"
-declare -r webdav_group="${WEBDAV_GROUP:?'Envorinment variable WEBDAV_GROUP must be defined'}"
+declare -r webdav_user="${WEBDAV_USER:?'Environment variable WEBDAV_USER must be defined'}"
+declare -r webdav_pwd="${WEBDAV_USER_PWD:?'Environment variable WEBDAV_USER_PWD must be defined'}"
+declare -r webdav_group="${WEBDAV_GROUP:?'Environment variable WEBDAV_GROUP must be defined'}"
 installAlpinePackages
 createUserAndGroup "${webdav_user}" "${webdav_uid}" "${webdav_group}" "${webdav_gid}" "${WEBDAV_HOME}" /bin/bash
 installTimezone
