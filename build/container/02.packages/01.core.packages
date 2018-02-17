@@ -1,0 +1,2 @@
+# core Packages
+apk add --no-cache lighttpd lighttpd-mod_webdav lighttpd-mod_auth sudo thttpd
