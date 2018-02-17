@@ -1,0 +1,22 @@
+
+declare -A webdav=()
+
+declare wbd_uid=${webdav_uid:-2222}
+declare wbd_gid=${webdav_gid:-2222}
+
+webdav['user']=${WEBDAV_USER:-webdav}
+webdav['uid']=${wbd_uid:-$(getent passwd "${webdav['user']}" | cut -d: -f3)}
+webdav['group']=${WEBDAV_GROUP:-webdav}
+webdav['gid']=${wbd_gid:-$(getent group "${webdav['user']}" | cut -d: -f3)}
+webdav['shell']=/bin/bash
+webdav['home']="${WEBDAV_HOME:-/webdav}"
+webdav['pwd']="${WEBDAV_USER_PWD:?'Environment variable WEBDAV_USER_PWD must be defined'}"
+
+#directories
+declare -r WEBDAV_HOME="${webdav['home']}"
+declare -r WEBDAV_CONF_DIR=/etc/lighttpd
+
+# Only allow read access by default
+declare -r WEBDAV_READWRITE=${WEBDAV_READWRITE:='disable'}
+declare -r WEBDAV_WHITELIST=${WEBDAV_WHITELIST:-'.'}
+

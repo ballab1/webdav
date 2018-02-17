@@ -3,33 +3,33 @@ version: '3.5'
 services:
     webdav:
         build:
-            context: ../webdav
             args:
-                TZ: "America/New_York"
+                CONTAINER_VERSION: 1.0.0
+                FROM_BASE: base_container:20180214
+                WEBDAV_GROUP: 'webdav'
+                WEBDAV_READWRITE: 'disable'
 #                WEBDAV_USER: "${CFG_MYSQL_USER}"
                 WEBDAV_USER: 'webdav'
                 WEBDAV_USER_PWD: "${CFG_MYSQL_PASSWORD}"
-                WEBDAV_GROUP: 'webdav'
-                WEBDAV_READWRITE: 'disable'
                 WEBDAV_WHITELIST: '127.0.0.1'
-        image: webdav:20171226
+            context: .
         container_name: webdav
-        hostname: webdav
-#        restart: unless-stopped
         environment:
-            TZ: "America/New_York"
 #            WEBDAV_USER: "${CFG_MYSQL_USER}"
             WEBDAV_USER: 'webdav'
             WEBDAV_USER_PWD: "${CFG_MYSQL_PASSWORD}"
             WEBDAV_GROUP: 'webdav'
             WEBDAV_READWRITE: 'disable'
             WEBDAV_WHITELIST: '127.0.0.1'
-        ports:
-            - 8003:8003
-        volumes:
-            - ../webdav/vols/webdav:/webdav
-            - ../webdav/vols/log:/var/log 
+        hostname: webdav
+        image: webdav:20180217
         logging:
             driver: "json-file"
             options:
                 max-size: "10m"
+        ports:
+            - 8003:80
+#        restart: unless-stopped
+        volumes:
+            - ../webdav/vols/webdav:/webdav
+            - ../webdav/vols/log:/var/log 
