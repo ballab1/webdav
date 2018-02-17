@@ -1,0 +1,13 @@
+#!/bin/bash
+
+source "${TOOLS}/03.users_groups/01.webdav"
+source /tmp/usr/local/bin/webdav-helper.sh
+
+mkdir -p "$WEBDAV_HOME"
+setConfigParams "$WEBDAV_CONF_DIR" \
+                "$WEBDAV_HOME" \
+                "${webdav['user']}" \
+                "${webdav['pwd']}" \
+                "${webdav['group']}" \
+                "$WEBDAV_WHITELIST" \
+                "$WEBDAV_READWRITE"
