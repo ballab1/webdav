@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "${TOOLS}/03.users_groups/01.webdav"
+source "${CBF['action']}/02.users_groups/01.webdav"
 source /tmp/usr/local/bin/webdav-helper.sh
 
 mkdir -p "$WEBDAV_HOME"

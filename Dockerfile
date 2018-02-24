@@ -18,8 +18,8 @@ COPY build /tmp/
 
 # build content
 RUN set -o verbose \
-    && chmod u+rwx /tmp/container/build.sh \
-    && /tmp/container/build.sh 'WEBDAV'
+    && chmod u+rwx /tmp/build.sh \
+    && /tmp/build.sh 'WEBDAV'
 RUN rm -rf /tmp/* 
 
 
