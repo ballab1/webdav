@@ -1,2 +1,5 @@
 # core Packages
-apk add --no-cache lighttpd lighttpd-mod_webdav lighttpd-mod_auth sudo thttpd
+
+if [ "${CBF['os_id']}" = 'alpine' ]; then
+    apk add --no-cache lighttpd lighttpd-mod_webdav lighttpd-mod_auth sudo thttpd
+fi

@@ -1,2 +1,5 @@
 # build Packages
-apk add --no-cache --virtual .buildDepedencies shadow
+
+if [ "${CBF['os_id']}" = 'alpine' ]; then
+    apk add --no-cache --virtual .buildDepedencies shadow
+fi

@@ -1,2 +1,5 @@
 # perl Packages
-apk add --no-cache perl perl-cgi perl-cgi-session perl-plack
+
+if [ "${CBF['os_id']}" = 'alpine' ]; then
+    apk add --no-cache perl perl-cgi perl-cgi-session perl-plack
+fi
