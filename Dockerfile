@@ -26,13 +26,14 @@ COPY build /tmp/
 RUN set -o verbose \
     && chmod u+rwx /tmp/build.sh \
     && /tmp/build.sh "$CONTAINER_NAME"
-RUN [[ $DEBUG_TRACE == 0 ]] && rm -rf /tmp/* 
+RUN [[ $DEBUG_TRACE != 0 ]] || rm -rf /tmp/* 
 
 
 # We expose webdav on port 80
 #EXPOSE 80
 #USER $WEBDAV_USER
 #VOLUME [ "/webdav" ]
+
 
 ENTRYPOINT [ "docker-entrypoint.sh" ]
 #CMD ["$CONTAINER_NAME"]
