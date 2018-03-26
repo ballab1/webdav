@@ -10,9 +10,6 @@ services:
                 FROM_BASE: base_container:20180314
                 WEBDAV_GROUP: webdav
                 WEBDAV_READWRITE: disable
-#                WEBDAV_USER: ${CFG_MYSQL_USER}
-                WEBDAV_USER: webdav
-                WEBDAV_USER_PWD: ${CFG_MYSQL_PASSWORD}
                 WEBDAV_WHITELIST: 127.0.0.1
             cache_from:
                 - alpine:3.6
@@ -21,9 +18,8 @@ services:
             dockerfile: Dockerfile
         container_name: webdav
         environment:
-#            WEBDAV_USER: ${CFG_MYSQL_USER}
-            WEBDAV_USER: webdav
-            WEBDAV_USER_PWD: ${CFG_MYSQL_PASSWORD}
+            WEBDAV_USER: ${CFG_USER}
+            WEBDAV_PASS: ${CFG_PASS}
             WEBDAV_GROUP: webdav
             WEBDAV_READWRITE: disable
             WEBDAV_WHITELIST: 127.0.0.1
