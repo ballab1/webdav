@@ -10,7 +10,9 @@ webdav['group']=webdav
 webdav['gid']=${wbd_gid:-$(getent group "${webdav['user']}" | cut -d: -f3)}
 webdav['shell']=/bin/bash
 webdav['home']="${WEBDAV_HOME:-/webdav}"
+set +o nounset
 [ -z "$WEBDAV_PASS" ] || webdav['pwd']="$WEBDAV_PASS"
+set -o nounset
 
 #directories
 declare -rx WEBDAV_HOME="${webdav['home']}"
