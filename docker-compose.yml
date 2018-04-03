@@ -8,13 +8,13 @@ services:
                 CONTAINER_NAME: webdav
                 CONTAINER_VERSION: 1.0.6
                 DEBUG_TRACE: 0
-                FROM_BASE: base_container:20180314
+                FROM_BASE: base_container:latest
                 WEBDAV_GROUP: webdav
                 WEBDAV_READWRITE: disable
                 WEBDAV_WHITELIST: 127.0.0.1
             cache_from:
                 - alpine:3.6
-                - base_container:20180314
+                - base_container:latest
             context: .
             dockerfile: Dockerfile
         container_name: webdav
@@ -25,7 +25,7 @@ services:
             WEBDAV_READWRITE: disable
             WEBDAV_WHITELIST: 127.0.0.1
         hostname: webdav
-        image: webdav:20180314
+        image: webdav:latest
         logging:
             driver: json-file
             options:
