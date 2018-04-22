@@ -12,6 +12,6 @@ declare -ar env_webdav=(
     'WEBDAV_WHITELIST="${WEBDAV_WHITELIST:-'"'.'"'}"'
 )
 
-lib.updateRuntimeEnvironment "${env_webdav[*]}"  
+crf.updateRuntimeEnvironment "${env_webdav[*]}"  
 
-lib.copyFileToRuntime 'LIB' 'webdav.bashlib'
+crf.copyFileToRuntime 'LIB' 'webdav.bashlib'
