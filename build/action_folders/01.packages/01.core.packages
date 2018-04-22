@@ -1,7 +1,0 @@
-# webdav core Packages
-
-if [ "${CBF['os_id']}" = 'alpine' ]; then
-    declare PKGS='lighttpd lighttpd-mod_webdav lighttpd-mod_auth sudo thttpd'
-    package.checkIfInstalled "$PKGS"
-    apk add --no-cache $PKGS
-fi 

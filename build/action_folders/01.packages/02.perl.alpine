@@ -1,0 +1,7 @@
+# webdav perl Packages
+
+declare -a PKGS=( perl
+                  perl-cgi
+                  perl-cgi-session
+                  perl-plack )
+ 

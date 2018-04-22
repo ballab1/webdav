@@ -1,0 +1,8 @@
+# webdav core Packages
+
+declare -a PKGS=( lighttpd
+                  lighttpd-mod_webdav
+                  lighttpd-mod_auth
+                  sudo
+                  thttpd )
+ 

@@ -1,7 +1,0 @@
-# webdav perl Packages
-
-if [ "${CBF['os_id']}" = 'alpine' ]; then
-    declare PKGS='perl perl-cgi perl-cgi-session perl-plack'
-    package.checkIfInstalled "$PKGS"
-    apk add --no-cache $PKGS
-fi 
