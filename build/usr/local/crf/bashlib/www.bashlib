@@ -1,0 +1,15 @@
+#!/bin/bash
+#############################################################################
+
+function www.UID()
+{
+    lib.lookupId passwd www-data 82
+}
+export -f www.UID
+
+#############################################################################
+function www.GID()
+{
+    lib.lookupId group www-data 82
+}
+export -f www.GID

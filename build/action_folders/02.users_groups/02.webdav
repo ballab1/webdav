@@ -1,0 +1,10 @@
+#!/bin/bash
+
+declare -A webdav=(
+    ['user']=${WEBDAV_USER:-webdav}
+    ['uid']="${WEBDAV_UID:-$(webdav.UID)}"
+    ['group']=${WEBDAV_GROUP:-webdav}
+    ['gid']="${WEBDAV_GID:-$(webdav.GID)}"
+    ['shell']=/bin/bash
+    ['home']="${WEBDAV_HOME:-/webdav}"
+)

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+declare -ar env_webdav=(
+    'WEBDAV_HOME="${WEBDAV_HOME:-/webdav}"'
+    'WEBDAV_USER=${WEBDAV_USER:-webdav}'
+    'WEBDAV_UID=${WEBDAV_UID:-$(webdav.UID)}'
+    'WEBDAV_GROUP=${WEBDAV_GROUP:-webdav}'
+    'WEBDAV_GID=${WEBDAV_GID:-$(webdav.GID)}'
+    'WEBDAV_PASS="${WEBDAV_PASS:-'"''"'}"'
+    'WEBDAV_CONF_DIR="${WEBDAV_CONF_DIR:-/etc/lighttpd}"'
+    'WEBDAV_READWRITE="${WEBDAV_READWRITE:-'"'"'disable'"'"'}"'
+    'WEBDAV_WHITELIST="${WEBDAV_WHITELIST:-'"'.'"'}"'
+)
+
+crf.updateRuntimeEnvironment "${env_webdav[*]}"  
+
+crf.copyFileToRuntime 'LIB' 'webdav.bashlib'
