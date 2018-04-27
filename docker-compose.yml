@@ -7,13 +7,13 @@ services:
                 CBF_VERSION: ${CBF_VERSION:-dev}
                 CONTAINER_NAME: webdav
                 CONTAINER_VERSION: 1.0.6
-                FROM_BASE: base_container:latest
+                FROM_BASE: base_container:${CONTAINER_TAG:-latest}
                 WEBDAV_GROUP: webdav
                 WEBDAV_READWRITE: disable
                 WEBDAV_WHITELIST: 127.0.0.1
             cache_from:
                 - alpine:3.6
-                - base_container:latest
+                - base_container:${CONTAINER_TAG:-latest}
             context: .
             dockerfile: Dockerfile
         container_name: webdav
@@ -25,7 +25,7 @@ services:
             WEBDAV_READWRITE: disable
             WEBDAV_WHITELIST: 127.0.0.1
         hostname: webdav
-        image: webdav:latest
+        image: webdav:${CONTAINER_TAG:-latest}
         logging:
             driver: json-file
             options:
