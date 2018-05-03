@@ -1,16 +1,22 @@
 #!/bin/bash
-
 #############################################################################
+
 function webdav.UID()
 {
-    lib.lookupId passwd webdav 2222
+    local -r user_name="${1:-webdav}"
+    local -r default_uid=${2:-2222}
+    
+    lib.lookupId "$user_name" 'passwd' "$default_uid"
 }
 export -f webdav.UID
 
 #############################################################################
 function webdav.GID()
 {
-    lib.lookupId group webdav 2222
+    local -r group_name="${1:-webdav}"
+    local -r default_gid=${2:-2222}
+    
+    lib.lookupId "$group_name" 'group' "$default_gid"
 }
 export -f webdav.GID 
 
