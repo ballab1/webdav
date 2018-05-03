@@ -2,8 +2,8 @@
 
 declare -A www=(
     ['user']=${WWW_USER:-www-data}
-    ['uid']=${WWW_UID:-$(www.UID)}
+    ['uid']=${WWW_UID:-$(www.UID "$WWW_USER")}
     ['group']=${WWW_GROUP:-www-data}
-    ['gid']=${WWW_GID:-$(www.GID)}
+    ['gid']=${WWW_GID:-$(www.GID "$WWW_GROUP")}
     ['shell']=/bin/bash
 )
