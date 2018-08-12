@@ -1,10 +1,10 @@
-ARG FROM_BASE=${DOCKER_REGISTRY:-}openjdk8:${BASE_TAG:-latest}
+ARG FROM_BASE=${DOCKER_REGISTRY:-}openjdk:${BASE_TAG:-latest}
 FROM $FROM_BASE
 
 # name and version of this docker image
 ARG CONTAINER_NAME=webdav
 # Specify CBF version to use with our configuration and customizations
-ARG CBF_VERSION="$CBF_VERSION"
+ARG CBF_VERSION
 
 # include our project files
 COPY build Dockerfile /tmp/
