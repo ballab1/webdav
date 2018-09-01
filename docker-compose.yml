@@ -27,7 +27,7 @@ services:
         environment:
             DEBUG_TRACE: ${DEBUG_TRACE:-0}
             WEBDAV_USER: $CFG_USER
-            WEBDAV_PASS: $CFG_PASS
+            WEBDAV_PASS_FILE: /run/secrets/webdav.pwd
             WEBDAV_GROUP: webdav
             WEBDAV_READWRITE: disable
             WEBDAV_WHITELIST: 127.0.0.1
@@ -41,6 +41,12 @@ services:
         ports:
             - 8003:80
 #        restart: unless-stopped
+        secrets:
+            - webdav.pwd
         volumes:
             - ./vols/webdav:/webdav
             - ./vols/log:/var/log
+
+secrets:
+   webdav.pwd:
+     file: ~/.inf/secrets/webdav.password
