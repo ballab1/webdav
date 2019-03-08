@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set +o nounset
+set +o errexit
+
+mkdir -p "$WEBDAV_HOME"
+webdav.setConfigParams "$WEBDAV_CONF_DIR" \
+                       "$WEBDAV_HOME" \
+                       "${webdav['user']}" \
+                       "${webdav['pwd']}" \
+                       "${webdav['group']}" \
+                       "$WEBDAV_WHITELIST" \
+                       "$WEBDAV_READWRITE"
