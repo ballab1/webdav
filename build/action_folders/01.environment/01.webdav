@@ -1,0 +1,26 @@
+#!/bin/bash
+
+declare -ar env_webdav=(
+    'WEBDAV_HOME="${WEBDAV_HOME:-/webdav}"'
+    'WEBDAV_USER=${WEBDAV_USER:-webdav}'
+    'WEBDAV_UID=${WEBDAV_UID:-$(webdav.UID "$WEBDAV_USER")}'
+    'WEBDAV_GROUP=${WEBDAV_GROUP:-webdav}'
+    'WEBDAV_GID=${WEBDAV_GID:-$(webdav.GID "$WEBDAV_GROUP")}'
+    'WEBDAV_PASS="${WEBDAV_PASS:-'"''"'}"'
+    'WEBDAV_CONF_DIR="${WEBDAV_CONF_DIR:-/etc/lighttpd}"'
+    'WEBDAV_READWRITE="${WEBDAV_READWRITE:-'"'"'disable'"'"'}"'
+    'WEBDAV_WHITELIST="${WEBDAV_WHITELIST:-'"'.'"'}"'
+    'WWW_USER=${WWW_USER:-www}'
+    'WWW_UID=${WWW_UID:-$(www.UID "$WWW_USER")}'
+    'WWW_GROUP=${WWW_GROUP:-www}'
+    'WWW_GID=${WWW_GID:-$(www.GID "$WWW_GROUP")}'
+    'WORKDIR="${WEBDAV_HOME}"'
+    'WWW="${WEBDAV_HOME}"'
+    'USER=webdav'
+)
+
+#remove WORKDIR so it comes after WWW
+crf.removeFromRuntimeEnvironment 'WORKDIR'   
+crf.removeFromRuntimeEnvironment 'WWW'   
+crf.removeFromRuntimeEnvironment 'USER'   
+crf.updateRuntimeEnvironment "${env_webdav[@]}"  

@@ -1,0 +1,169 @@
+#!/bin/bash
+#############################################################################
+
+function webdav.UID()
+{
+    local -r user_name="${1:-webdav}"
+    local -r default_uid=${2:-${WEBDAV_UID:-2222}}
+
+    lib.lookupId "$user_name" 'passwd' "$default_uid"
+}
+export -f webdav.UID
+
+#############################################################################
+function webdav.GID()
+{
+    local -r group_name="${1:-webdav}"
+    local -r default_gid=${2:-${WEBDAV_GID:-2222}}
+
+    lib.lookupId "$group_name" 'group' "$default_gid"
+}
+export -f webdav.GID
+
+#############################################################################
+function webdav.isReadOnly()
+{
+    local -r isReadWrite=$1
+
+    local isRO='"enable"'
+    case "$isReadWrite" in
+        true)      isRO='"disable"';break;;
+        "true")    isRO='"disable"';break;;
+        'true')    isRO='"disable"';break;;
+        yes)       isRO='"disable"';break;;
+        "yes")     isRO='"disable"';break;;
+        'yes')     isRO='"disable"';break;;
+        enable)    isRO='"disable"';break;;
+        "enable")  isRO='"disable"';break;;
+        'enable')  isRO='"disable"';break;;
+        enabled)   isRO='"disable"';break;;
+        "enabled") isRO='"disable"';break;;
+        'enabled') isRO='"disable"';break;;
+    esac
+
+    echo "s_is-readonly = \"\\w*\"_is-readonly = ${isRO}_g"
+}
+export -f webdav.isReadOnly
+
+#############################################################################
+function webdav.setHtPasswd()
+{
+    local -r conf_dir=$1
+    local -r user=$2
+    local -r pwd=$3
+
+    [[ -z "$user" || -z "$pwd" ]] && return
+
+    local -r pwd_file="${conf_dir}/htpasswd"
+    rm "$pwd_file"
+    echo "$pwd" | htpasswd -c "$pwd_file" "$user"
+    chmod 444 "$pwd_file"
+    chown "$user" "${conf_dir}/"*
+}
+export -f webdav.setHtPasswd
+
+#############################################################################
+function webdav.setFilePermissions()
+{
+    local -r conf_dir=$1
+    local -r user=$2
+    local -r group=$3
+    local -r home_dir=$4
+
+    touch /run/lighttpd.pid
+    chown "$user":"$group" /run/lighttpd.pid
+
+    chmod a+rxw -R /var/log
+    chown "$user":"$group" /var/log
+    chown "$user":"$group" "${conf_dir}/"*
+    chown "$user":"$group" -R "$home_dir"
+}
+export -f webdav.setFilePermissions
+
+#############################################################################
+function webdav.setUserAngGroupAccess()
+{
+    local -r conf_dir=$1
+    local -r user=$2
+    local -r group=$3
+
+    if [ -e "${conf_dir}/lighttpd.conf" ]; then
+        echo "Updating ${conf_dir}/lighttpd.conf"
+
+        local f1="^.*server.username\s+=.*\$"
+        local t1=" server.username = ${user}"
+        sed -i "s_${f1}_${t1}_" "${conf_dir}/lighttpd.conf"
+
+        local f2="^.*server.groupname\s+=.*\$"
+        local t2=" server.groupname = ${group}"
+        sed -i "s_${f2}_${t2}_" "${conf_dir}/lighttpd.conf"
+    else
+        echo "${conf_dir}/lighttpd.conf not found"
+    fi
+}
+export -f webdav.setUserAngGroupAccess
+
+#############################################################################
+function webdav.setWhiteList()
+{
+    local -r conf_dir=$1
+    local -r read_write=$2
+    local -r whitelist=$3
+
+    if [ -e "${conf_dir}/webdav.conf" ]; then
+        [[ -n "$whitelist" ]] && sed -i "s/WHITELIST/${whitelist}/" "${conf_dir}/webdav.conf"
+        sed -i "$( webdav.isReadOnly $read_write )" "${conf_dir}/webdav.conf"
+    else
+        echo "${conf_dir}/webdav.conf not found"
+    fi
+}
+export -f webdav.setWhiteList
+
+#############################################################################
+function webdav.setConfigParams()
+{
+    local -r conf_dir=$1
+    local -r home_dir=$2
+    local -r user=$3
+    local -r pwd=$4
+    local -r group=$5
+    local -r whitelist=$6
+    local -r readwrite=$7
+
+    webdav.setFilePermissions "$conf_dir" "$user" "$group" "$home_dir"
+    webdav.setHtPasswd "$conf_dir" "$user" "$pwd"
+    webdav.setUserAngGroupAccess "$conf_dir" "$user" "$group"
+    webdav.setWhiteList "$conf_dir" "$readwrite" "$whitelist"
+}
+export -f webdav.setConfigParams
+
+#############################################################################
+function webdav.updateConfigParams()
+{
+    local -r conf_dir=$1
+    local home_dir=$2
+    local user=$3
+    local -r pwd=$4
+    local group=$5
+    local whitelist=$6
+    local readwrite=$7
+
+    local -r cfg_user=$( cat "${conf_dir}/lighttpd.conf" | grep 'server.username' | sed 's_^.+=\s+"?([!"]+)"?$_\1_' )
+    local -r cfg_group=$( cat "${conf_dir}/lighttpd.conf" | grep 'server.groupname' | sed 's_^.+=\s+"?([!"]+)"?$_\1_' )
+    local -r cfg_home_dir=$( cat "${conf_dir}/lighttpd.conf" | grep 'server.document-root' | sed 's_^.+=\s+"?([!"]+)"?$_\1_' )
+    local -r cfg_whitelist=$( cat "${conf_dir}/webdav.conf" | grep 'webdav.is-readonly' | sed 's_^.+=\s+"?([!"]+)"?$_\1_' )
+    local -r cfg_readonly=$( cat "${conf_dir}/webdav.conf" | grep 'webdav.is-readonly' | sed 's_^.+=\s+"?([!"]+)"?$_\1_' )
+
+    webdav.setFilePermissions "$conf_dir" "$user" "$group" "$home_dir"
+
+    [[ -z $user ]]  && user=$cfg_user
+    [[ -z $group ]] && group=$cfg_group
+    [[ -z $whitelist ]] && whitelist=$cfg_whitelist
+    [[ -z $readwrite ]] && readwrite=$cfg_readonly
+
+    [[ $cfg_user != $user ]] && webdav.setHtPasswd "$conf_dir" "$user" "$pwd"
+    [[ $cfg_user != $user || $cfg_group != $group ]] && webdav.setUserAngGroupAccess "$conf_dir" "$user" "$group"
+    [[ $cfg_readonly != $readwrite || $cfg_whitelist != $whitelist ]] && webdav.setWhiteList "$conf_dir" "$readwrite" "$whitelist"
+}
+
+export -f webdav.updateConfigParams
