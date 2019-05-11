@@ -1,10 +1,13 @@
 version: '3.3'
 
-# repo: https://github/ballab1/webdav.git
+# this is a SAMPLE file. Do not use for build or deployments
+
+# use the following to restrict which OS this is built on
 # containerOS: alpine
 
 services:
     webdav:
+# build arguments, only needed for building
         build:
             args:
                 CBF_VERSION: ${CBF_VERSION:-}
@@ -26,12 +29,37 @@ services:
                 container.git.url: $CONTAINER_GIT_URL
                 container.origin: $CONTAINER_ORIGIN
                 container.original.name: webdav
-                container.parent: $CONTAINER_PARENT
                 version.cbf: $CBF_VERSION
         container_name: webdav
+# common arguments, for building and deploy 
         environment:
             DEBUG_TRACE: ${DEBUG_TRACE:-0}
+            WEBDAV_USER: $CFG_USER
+            WEBDAV_PASS_FILE: /run/secrets/webdav.pwd
+#            WEBDAV_GROUP: webdav
             WEBDAV_READWRITE: disable
             WEBDAV_WHITELIST: 127.0.0.1
         hostname: webdav
         image: ${DOCKER_REGISTRY:-ubuntu-s2:5000/}${CONTAINER_OS:-alpine}/webdav:${CONTAINER_TAG:-latest}
+# deploy arguments, not needed for building
+        logging:                              # limit size of logs @runtime so that we do not run out of space 
+            driver: json-file
+            options:
+                max-file: "3"
+                max-size: "10m"
+        ports:                                #ports exposed 
+            - 8003:80
+        restart: unless-stopped               # only use when building a 'service container'
+# references to 'secrets' section below
+        secrets:
+            - webdav.pwd
+        volumes:
+# shared webdav folder
+            - ./vols/webdav:/webdav
+# application logs
+            - ./vols/log:/var/log
+
+secrets:
+# location of secrets files in host filesystem
+   webdav.pwd:
+     file: ~/.inf/secrets/webdav.password
