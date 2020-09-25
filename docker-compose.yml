@@ -9,13 +9,13 @@ services:
             args:
                 CBF_VERSION: ${CBF_VERSION:-}
                 CONTAINER_NAME: webdav
-                FROM_BASE: ${DOCKER_REGISTRY:-ubuntu-s2.home:5000/}${CONTAINER_OS:-alpine}/base_container:${BASE_TAG:-latest}
+                FROM_BASE: ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}${CONTAINER_OS:-alpine}/base_container:${BASE_TAG:-latest}
 #                WEBDAV_GROUP: webdav
                 WEBDAV_READWRITE: disable
                 WEBDAV_WHITELIST: 127.0.0.1
             cache_from:
-                - ${DOCKER_REGISTRY:-ubuntu-s2.home:5000/}thirdparty/${CONTAINER_OS:-alpine}:${OS_VERSION:-3.8}
-                - ${DOCKER_REGISTRY:-ubuntu-s2.home:5000/}${CONTAINER_OS:-alpine}/base_container:${BASE_TAG:-latest}
+                - ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}thirdparty/${CONTAINER_OS:-alpine}:${OS_VERSION:-3.8}
+                - ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}${CONTAINER_OS:-alpine}/base_container:${BASE_TAG:-latest}
             context: .
             dockerfile: Dockerfile
             labels:
@@ -34,4 +34,4 @@ services:
             WEBDAV_READWRITE: disable
             WEBDAV_WHITELIST: 127.0.0.1
         hostname: webdav
-        image: ${DOCKER_REGISTRY:-ubuntu-s2.home:5000/}${CONTAINER_OS:-alpine}/webdav:${CONTAINER_TAG:-latest}
+        image: ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}${CONTAINER_OS:-alpine}/webdav:${CONTAINER_TAG:-latest}
