@@ -14,7 +14,7 @@ services:
                 WEBDAV_READWRITE: disable
                 WEBDAV_WHITELIST: 127.0.0.1
             cache_from:
-                - ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}thirdparty/${CONTAINER_OS:-alpine}:${OS_VERSION:-3.12.0}
+                - ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}thirdparty/${CONTAINER_OS:-alpine}:${OS_VERSION:-3.12.4}
                 - ${DOCKER_REGISTRY:-s2.ubuntu.home:5000/}${CONTAINER_OS:-alpine}/base_container:${BASE_TAG:-latest}
             context: .
             dockerfile: Dockerfile
