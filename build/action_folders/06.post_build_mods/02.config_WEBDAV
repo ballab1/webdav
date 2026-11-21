@@ -3,13 +3,13 @@
 set +o nounset
 set +o errexit
 
-[ ! -f "$(crf.STARTUP)/99.workdir.sh" ] || rm "$(crf.STARTUP)/99.workdir.sh"
+[ ! -f "$(crf::STARTUP)/99.workdir.sh" ] || rm "$(crf::STARTUP)/99.workdir.sh"
 
 mkdir -p "$WEBDAV_HOME"
-webdav.setConfigParams "$WEBDAV_CONF_DIR" \
-                       "$WEBDAV_HOME" \
-                       "${webdav['user']}" \
-                       "${webdav['pwd']}" \
-                       "${webdav['group']}" \
-                       "$WEBDAV_WHITELIST" \
-                       "$WEBDAV_READWRITE"
+webdav::setConfigParams "$WEBDAV_CONF_DIR" \
+                        "$WEBDAV_HOME" \
+                        "${webdav['user']}" \
+                        "${webdav['pwd']}" \
+                        "${webdav['group']}" \
+                        "$WEBDAV_WHITELIST" \
+                        "$WEBDAV_READWRITE"
